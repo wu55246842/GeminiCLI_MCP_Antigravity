@@ -1,0 +1,31 @@
+{
+  "name": "geminicli-mcp-antigravity",
+  "version": "1.0.0",
+  "description": "Local MCP Server for Gemini CLI and Antigravity code analysis",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node --no-warnings dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@google/genai": "^1.42.0",
+    "@modelcontextprotocol/sdk": "^1.4.1",
+    "cheerio": "^1.2.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "ignore": "^5.3.1",
+    "multer": "^2.0.2",
+    "node-pty": "^1.1.0",
+    "strip-ansi": "^7.1.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^20.14.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.3"
+  }
+}

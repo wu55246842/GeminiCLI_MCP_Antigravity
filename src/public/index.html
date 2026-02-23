@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My AI Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="chat-header">
+            <div class="header-title">
+                <div class="logo"></div>
+                <h1>My AI Assistant</h1>
+            </div>
+            <p class="subtitle">Multi-modal AI powered by Google GenAI</p>
+
+            <div class="header-controls">
+                <div class="engine-toggle-container">
+                    <span class="engine-label api-label">Gemini API</span>
+                    <label class="switch">
+                        <input type="checkbox" id="engineToggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="engine-label cli-label active">Local CLI</span>
+                </div>
+                <button id="settingsBtn" class="icon-btn" title="Authentication Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Authentication Settings</h2>
+                    <span class="close-btn">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-desc">Paste the RSA Private Key generated in your backend terminal here. It will be
+                        stored securely in your browser's LocalStorage and used to cryptographically sign commands sent
+                        to the local CLI.</p>
+                    <textarea id="privateKeyInput" placeholder="-----BEGIN PRIVATE KEY-----\n..." rows="8"></textarea>
+                    <button id="saveKeyBtn" class="primary-btn">Save Key</button>
+                    <p id="keyStatusMsg" class="status-msg"></p>
+                </div>
+            </div>
+        </div>
+
+        <main class="chat-window" id="chatWindow">
+            <div class="welcome-message">
+                <h2>How can I help you today?</h2>
+                <p>Send a message, or drag and drop images and files below.</p>
+            </div>
+        </main>
+
+        <div class="input-area">
+            <div class="file-preview-container" id="filePreviewContainer"></div>
+
+            <form id="chatForm" class="chat-form">
+                <label for="fileInput" class="upload-btn" title="Upload files">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                    </svg>
+                </label>
+                <input type="file" id="fileInput" multiple accept="image/*,.pdf,.txt,.js,.ts,.json,.md" hidden>
+
+                <textarea id="messageInput" placeholder="Message Gemini..." rows="1" autofocus></textarea>
+
+                <button type="submit" id="sendBtn" class="send-btn" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m22 2-7 20-4-9-9-4Z" />
+                        <path d="M22 2 11 13" />
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
