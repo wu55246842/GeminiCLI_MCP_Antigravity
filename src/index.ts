@@ -79,6 +79,6 @@ app.use(express.static(path.join(__dirname, '../src/public')));
 app.use('/api', chatRouter);
 
 const PORT = config.PORT;
-app.listen(PORT, '127.0.0.1', () => {
-    console.log(`Listening on http://127.0.0.1:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Listening on http://localhost:${PORT} and your local network IP!`);
 });

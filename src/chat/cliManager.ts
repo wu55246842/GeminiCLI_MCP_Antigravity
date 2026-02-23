@@ -38,13 +38,17 @@ export function sendToCli(message: string) {
 
     // Read the file natively using PowerShell's Get-Content or Bash's cat and pipe it into the --prompt flag
     const commandLine = os.platform() === 'win32'
-        ? `$env:NODE_OPTIONS="--no-warnings"; $promptText = Get-Content -Raw -Path "${tempPromptFile}"; gemini --prompt $promptText`
+        ? `$OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = New-Object System.Text.UTF8Encoding; $env:NODE_OPTIONS="--no-warnings"; $promptText = Get-Content -Raw -Path "${tempPromptFile}"; gemini --prompt $promptText`
         : `NODE_OPTIONS="--no-warnings" gemini --prompt "$(cat ${tempPromptFile})"`;
 
     const geminiProcess = spawn(os.platform() === 'win32' ? 'powershell.exe' : 'bash', ['-Command', commandLine], {
         cwd: config.WORKSPACE_ROOT,
         env: process.env // Inherit env vars so gemini can find its config
     });
+
+    // Force UTF-8 encoding to prevent Windows PowerShell from mangling output like Chinese characters
+    geminiProcess.stdout.setEncoding('utf8');
+    geminiProcess.stderr.setEncoding('utf8');
 
     // Cleanup the temp file when process exits
     const cleanup = () => {
@@ -63,21 +67,23 @@ export function sendToCli(message: string) {
     geminiProcess.stderr.on('data', (data) => {
         const text = data.toString();
         const cleanText = text.replace(ansiRegex, '');
+        const trimmed = cleanText.trim();
 
         // Suppress the annoying punycode DeprecationWarning from third party libs
         // Also suppress "Loaded cached credentials" and "Tool execution denied by policy" that spam the UI
-        if (cleanText.includes('DeprecationWarning') ||
-            cleanText.includes('punycode') ||
-            cleanText.includes('Loaded cached credentials') ||
-            cleanText.includes('Tool execution denied by policy')) {
+        if (!trimmed ||
+            trimmed.includes('DeprecationWarning') ||
+            trimmed.includes('punycode') ||
+            trimmed.includes('Loaded cached credentials') ||
+            trimmed.includes('Tool execution denied by policy')) {
             return;
         }
 
-        console.error(`[CLI Manager STDERR]: ${cleanText}`);
+        console.error(`[CLI Manager STDERR]: ${trimmed}`);
 
         // Broadcast errors to stream so the user knows
         for (const sub of streamSubscribers) {
-            sub(`\n[CLI ERROR]: ${cleanText}`);
+            sub(`\n[CLI ERROR]: ${trimmed}`);
         }
     });
 

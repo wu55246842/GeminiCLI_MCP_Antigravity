@@ -72,11 +72,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const payloadToSign = `GET:/api/chat/stream:${timestamp}`;
 
         signData(payloadToSign).then(signatureBase64 => {
-            if (!signatureBase64) {
-                alert("Please set your Private Key in Settings to access the CLI Stream.");
+            if (signatureBase64 === "UNSUPPORTED_CONTEXT") {
+                console.warn("Cannot initialize SSE stream over insecure HTTP.");
+                alert("Security Error: SSE stream cannot be established. Please use localhost or setup HTTPS, as mobile browsers block cryptographic APIs on plain HTTP.");
+                // Fall back visually to API mode if they can't use CLI
+                engineToggle.click();
                 return;
             }
 
+            if (!signatureBase64) {
+                console.warn("No private key configured, SSE stream will likely be rejected.");
+                // We let it try anyway so the backend 401 shows up or if the system disables auth
+            }
             // Unfortunately EventSource doesn't support custom headers natively.
             // But we must send auth. The closest native alternative is fetch with streams.
             // However, to keep it simple and maintain EventSource, we can append it as a query param 
@@ -245,6 +252,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const pemKey = localStorage.getItem('gemini_cli_private_key');
         if (!pemKey) return null;
 
+        if (!window.crypto || !window.crypto.subtle) {
+            console.error("Web Crypto API is not available. This is usually because you are accessing the site via HTTP instead of HTTPS or localhost.");
+            return "UNSUPPORTED_CONTEXT";
+        }
+
         try {
             const privateKey = await importPrivateKey(pemKey);
             const enc = new TextEncoder();
@@ -399,6 +411,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const timestamp = new Date().toISOString();
         const payloadToSign = `POST:/api/chat:${timestamp}`;
         let signatureBase64 = await signData(payloadToSign);
+
+        if (signatureBase64 === "UNSUPPORTED_CONTEXT") {
+            indicator.remove();
+            alert("Security Error: The Cryptographic Security module requires a Secure Context. You cannot use this app over plain HTTP (like 192.168.x.x) on mobile devices due to browser restrictions. Please use localhost or setup HTTPS.");
+            return;
+        }
 
         if (!signatureBase64) {
             indicator.remove();
